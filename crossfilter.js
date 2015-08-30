@@ -1,5 +1,5 @@
 (function(exports){
-crossfilter.version = "1.3.12";
+crossfilter.version = "1.3.12.hola1";
 function crossfilter_identity(d) {
   return d;
 }
@@ -532,9 +532,12 @@ function crossfilter() {
   var crossfilter = {
     add: add,
     remove: removeData,
+    removeIf: removeIf,
     dimension: dimension,
     groupAll: groupAll,
-    size: size
+    size: size,
+    onChange: onChange,
+    offChange: offChange,
   };
 
   var data = [], // the records
@@ -572,7 +575,20 @@ function crossfilter() {
       if (filters[i]) newIndex[i] = j++;
       else removed.push(i);
     }
+    doRemove(newIndex, removed);
+  }
 
+  function removeIf(f) {
+    var newIndex = crossfilter_index(n, n),
+        removed = [];
+    for (var i = 0, j = 0; i < n; ++i) {
+      if (f(data[i])) newIndex[i] = j++;
+      else removed.push(i);
+    }
+    doRemove(newIndex, removed);
+  }
+
+  function doRemove(newIndex, removed) {
     // Remove all matching records from groups.
     filterListeners.forEach(function(l) { l(0, [], removed); });
 
@@ -588,6 +604,21 @@ function crossfilter() {
     }
     data.length = j;
     while (n > j) filters[--n] = 0;
+  }
+
+  function onChange(fn) {
+    filterListeners.push(fn);
+    dataListeners.push(fn);
+    removeDataListeners.push(fn);
+  }
+
+  function offChange(fn) {
+    var i = filterListeners.indexOf(fn);
+    if (i >= 0) filterListeners.splice(i, 1);
+    i = dataListeners.indexOf(fn);
+    if (i >= 0) dataListeners.splice(i, 1);
+    i = removeDataListeners.indexOf(fn);
+    if (i >= 0) removeDataListeners.splice(i, 1);
   }
 
   // Adds a new dimension with the specified value accessor function.
