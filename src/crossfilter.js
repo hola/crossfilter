@@ -7,7 +7,9 @@ function crossfilter() {
     removeIf: removeIf,
     dimension: dimension,
     groupAll: groupAll,
-    size: size
+    size: size,
+    onChange: onChange,
+    offChange: offChange,
   };
 
   var data = [], // the records
@@ -74,6 +76,21 @@ function crossfilter() {
     }
     data.length = j;
     while (n > j) filters[--n] = 0;
+  }
+
+  function onChange(fn) {
+    filterListeners.push(fn);
+    dataListeners.push(fn);
+    removeDataListeners.push(fn);
+  }
+
+  function offChange(fn) {
+    var i = filterListeners.indexOf(fn);
+    if (i >= 0) filterListeners.splice(i, 1);
+    i = dataListeners.indexOf(fn);
+    if (i >= 0) dataListeners.splice(i, 1);
+    i = removeDataListeners.indexOf(fn);
+    if (i >= 0) removeDataListeners.splice(i, 1);
   }
 
   // Adds a new dimension with the specified value accessor function.
