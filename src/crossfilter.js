@@ -4,7 +4,6 @@ function crossfilter() {
   var crossfilter = {
     add: add,
     remove: removeData,
-    removeIf: removeIf,
     dimension: dimension,
     groupAll: groupAll,
     size: size,
@@ -47,20 +46,7 @@ function crossfilter() {
       if (filters[i]) newIndex[i] = j++;
       else removed.push(i);
     }
-    doRemove(newIndex, removed);
-  }
 
-  function removeIf(f) {
-    var newIndex = crossfilter_index(n, n),
-        removed = [];
-    for (var i = 0, j = 0; i < n; ++i) {
-      if (f(data[i])) newIndex[i] = j++;
-      else removed.push(i);
-    }
-    doRemove(newIndex, removed);
-  }
-
-  function doRemove(newIndex, removed) {
     // Remove all matching records from groups.
     filterListeners.forEach(function(l) { l(0, [], removed); });
 
