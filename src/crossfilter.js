@@ -54,7 +54,7 @@ function crossfilter() {
     var newIndex = crossfilter_index(n, n),
         removed = [];
     for (var i = 0, j = 0; i < n; ++i) {
-      if (f(data[i])) newIndex[i] = j++;
+      if (!f(data[i])) newIndex[i] = j++;
       else removed.push(i);
     }
     doRemove(newIndex, removed);
